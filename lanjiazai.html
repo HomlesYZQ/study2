@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			.clearfix:after{
+				content: "";
+				height: 0;
+				display: block;
+				clear: both;
+				visibility: hidden;
+			}
+			.cont{
+				width: 660px;
+			    margin: 100px auto;
+			    border: 1px solid #ccc;
+			}
+			.head{
+				font-size: 24px;
+				text-align: center;
+			}
+			.imgs{
+				width: 100%;
+				padding-top: 5px;
+			}
+			.imgs>div{
+				width: 200px;
+			    height: 120px;
+			    float: left;
+			    margin: 10px;
+			    position: relative;
+			    background: url(images/loading24.gif)no-repeat;
+			    background-size: 50%;
+			}
+			.imgs>div img{
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+		<script src="JQuery.js"></script>
+	</head>
+	<body>
+		<div class="cont">
+			<div class="head">图片延迟加载</div>
+			<div class="imgs" id="imgs">
+				
+			</div>
+		</div>
+	</body>
+</html>
+<script>
+$(function(){
+	$.get("pic.json",function(arr){
+		var st=""
+		$.each(arr,function(index,value){
+			st+="<div>"
+				st+="<img src='' datasrc='"+arr[index].img+"'/>"
+			st+="</div>"
+		})
+		$("#imgs").html(st)
+		var offTop=function(ele) {  
+            var top=null;
+            var eleTop=ele.offsetTop;
+            var eleParent=ele.offsetParent;
+            top+=eleTop;
+            while(eleParent) {
+                top+=eleParent.offsetTop;
+                eleParent=eleParent.offsetParent;
+            }
+            return top;
+        }
+        var ljz=function(img){  
+            var windowToop=$(window).height()+$(window).scrollTop();
+            var imgTop=offTop(img)+img.offsetHeight;
+            if (windowToop>imgTop) {
+                if(img.key){
+                    return;
+                }
+                var imgs=new Image;
+                imgs.src=img.getAttribute('datasrc')
+                imgs.onload=function () {  
+                    img.src=this.src;
+                }
+                img.key=true;
+            }
+        }
+        var imgs=$('img');
+        var allImg=function(){  
+            $.each(imgs,function(i,value) {  
+                if (imgs[i].key) {
+                    return true;
+                }
+                ljz(imgs[i]) 
+            })
+        }
+        setTimeout(function(){allImg()},500)
+        $(window).scroll(function () {  
+            allImg()
+        })
+	})
+})
+</script>
+<!--<script type="text/javascript">
+$(function(){
+	function imgLazy(){
+	    $.each($(".imgs img"),function(index,obj){        
+	        var windowHeight=$(window).height();
+	        var scrollTop=$(document).scrollTop();
+	        windowHeight=windowHeight; 
+	        if($(obj).attr("src")==$(obj).attr("srcdata")){
+	            return true;
+	        }else if( $(obj).offset().top<=(scrollTop+windowHeight) && $(obj).offset().top >= scrollTop ){
+	            if($(obj).attr("srcdata") != undefined || $(obj).attr("srcdata") != "undefined" ){
+	                var ObjectSrc = $(obj).attr("srcdata");
+	                console.log($(obj))
+	                $(obj).attr("src",ObjectSrc);
+	                $(obj).css("display","block");
+	                $(obj).fadeTo(1000,0.90);
+	            }
+	        }              
+	    });
+	}
+	setTimeout(imgLazy,1000)
+    $(document).scroll(imgLazy);
+})
+</script>-->
